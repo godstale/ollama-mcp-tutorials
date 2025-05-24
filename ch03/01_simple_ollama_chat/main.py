@@ -1,12 +1,12 @@
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
 
-# 1. LLM 모델 객체 생성 (llama3 모델 사용)
-llm = ChatOllama(model="qwen3:14b")
+# 1. LLM 모델 객체 생성
+llm = ChatOllama(model="llama3:14b")
 
 # 2. 사용자 입력을 받아 모델에 직접 전달
 while True:
-    user_input = input("🤖 질문을 입력하세요 (종료하려면 'exit'): ")
+    user_input = input("질문을 입력하세요 (종료: exit): ")
     if user_input.lower() == "exit":
         break
 
@@ -17,4 +17,4 @@ while True:
     response = llm.invoke(messages)
 
     # 5. 응답 출력
-    print("🧠 답변:", response.content)
+    print("답변:", response.content)

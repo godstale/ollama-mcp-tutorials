@@ -5,5 +5,6 @@ description = "간단한 Ollama 챗봇 예제"
 requires-python = ">=3.10"
 dependencies = [
     "langchain-core==0.3.61",
-    "langchain-ollama==0.3.3"
+    "langchain-ollama==0.3.3",
+    "pydantic>=2.0.0"
 ]

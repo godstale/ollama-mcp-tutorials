@@ -1,0 +1,21 @@
+{
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "python.autoComplete.extraPaths": ["./langchain_teddynote_lib"],
+  "python.analysis.typeCheckingMode": "basic",
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#004c7f" // 현재 선택된 탭의 배경색
+  },
+  "black-formatter.args": [
+    "--line-length",
+    "88"
+  ],
+  "python.analysis.extraPaths": [
+    "./langchain_teddynote_lib"
+  ]
+}

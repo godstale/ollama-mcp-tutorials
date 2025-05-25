@@ -2,7 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
 
 # 1. LLM 모델 객체 생성
-llm = ChatOllama(model="llama3:14b")
+llm = ChatOllama(model="qwen3:8b")
 
 # 2. 사용자 입력을 받아 모델에 직접 전달
 while True:

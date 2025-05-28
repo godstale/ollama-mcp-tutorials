@@ -79,4 +79,4 @@ cython_debug/
 
 # 환경 변수
 .env
-
+settings.json

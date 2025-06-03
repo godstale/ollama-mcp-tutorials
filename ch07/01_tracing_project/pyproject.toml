@@ -1,0 +1,15 @@
+[project]
+name = "ollama-mcp-tutorial"
+version = "0.1.0"
+description = "Ollama, LangChain, FAISS, PDF 문서 임베딩 및 질의응답 챗봇 예제 (ch07/01_tracing_project)"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-core==0.3.61",
+    "langchain-ollama==0.3.3",
+    "langchain==0.3.25",
+    "langchain-community",
+    "langchain-text-splitters",
+    "faiss-cpu",
+    "python-dotenv",
+    "pypdf",
+]

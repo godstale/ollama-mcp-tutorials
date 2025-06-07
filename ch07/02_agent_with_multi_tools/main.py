@@ -84,8 +84,8 @@ chat_history = []
 # 6. 대화 루프 실행
 while True:
     # 6-1. 사용자 입력 받기
-    user_input = input("\n\n당신 (종료 q): ")
-    if user_input.lower() in ("끝", "q", "exit"):
+    user_input = input("질문을 입력하세요 (종료: exit): ")
+    if user_input.lower() == "exit":
         break
 
     # 6-2. 에이전트 실행 및 응답 생성

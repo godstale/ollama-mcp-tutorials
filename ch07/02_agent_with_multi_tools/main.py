@@ -71,7 +71,12 @@ tools = [search_tool, math_tool]
 # 4. ReAct 에이전트와 실행기 생성
 # verbose=True로 설정하여 에이전트의 추론 과정을 출력합니다.
 agent = create_react_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    handle_parsing_errors=True
+)
 
 # 5. 대화 기록을 저장할 리스트 초기화
 chat_history = []

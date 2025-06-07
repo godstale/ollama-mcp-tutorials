@@ -43,11 +43,9 @@ prompt = ChatPromptTemplate.from_template(
 
 # 2. OpenAI의 Chat 모델 초기화
 # temperature=0으로 설정하여 일관된 응답을 생성하도록 합니다.
-openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = ChatOpenAI(
     temperature=0,
-    model_name="gpt-4o-mini",
-    openai_api_key=openai_api_key,
+    model_name="gpt-4.1-mini",
 )
 
 # 3. 에이전트가 사용할 도구들 초기화

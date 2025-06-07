@@ -5,6 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.tools.ddg_search.tool import DuckDuckGoSearchRun
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_react_agent
+from langchain_core.messages import HumanMessage, AIMessage
 
 # 2. 환경변수 파일(.env)에서 API 키 등의 설정을 로드
 load_dotenv()
@@ -13,6 +14,8 @@ load_dotenv()
 prompt = ChatPromptTemplate.from_template(
     """당신은 유능한 기상학자입니다. 필요한 경우 다음 도구들을 사용할 수 있습니다: 
     {tools}
+
+    Important: You must strictly follow the format below. The Final Answer should only appear after a Thought. If no Action is needed, do not skip it or write that you're proceeding without an action — always adhere to the structure.
 
     Use the following format:
         Thought: you should always think about what to do
@@ -41,8 +44,12 @@ tools = [DuckDuckGoSearchRun()]
 
 # 6. ReAct 에이전트 생성 및 실행기 설정
 agent = create_react_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    handle_parsing_errors=True
+)
 # 7. 대화 기록을 저장할 리스트 초기화
 chat_history = []
 
@@ -75,10 +82,8 @@ while True:
         print(f"\nAI: {response}")
         
         # 15. 대화 기록에 현재 대화 추가
-        chat_history.extend([
-            f"user: {user_input}",
-            f"assistant: {response}"
-        ])
-        
+        chat_history.append(HumanMessage(content=user_input))
+        chat_history.append(AIMessage(content=response))
+
     except Exception as e:
         print(f"오류가 발생했습니다: {e}")

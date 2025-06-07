@@ -33,8 +33,7 @@ prompt = ChatPromptTemplate.from_template(
 llm = ChatOpenAI(
     temperature=0,
     max_tokens=2048,
-    model_name="gpt-4o-mini",
-    openai_api_key=os.getenv("OPENAI_API_KEY")
+    model_name="gpt-4.1-mini"
 )
 
 # 5. 검색 도구 설정 (DuckDuckGo 검색 엔진 사용)

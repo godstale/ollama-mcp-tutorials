@@ -7,6 +7,7 @@ from langchain.agents.react.agent import create_react_agent
 from langchain.chains.llm_math.base import LLMMathChain
 from langchain.agents import Tool
 from langchain.agents.agent import AgentExecutor
+from langchain_core.messages import HumanMessage, AIMessage
 
 # 환경 변수 로드 (.env 파일에서 API 키 등을 로드)
 load_dotenv()
@@ -42,11 +43,9 @@ prompt = ChatPromptTemplate.from_template(
 
 # 2. OpenAI의 Chat 모델 초기화
 # temperature=0으로 설정하여 일관된 응답을 생성하도록 합니다.
-openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = ChatOpenAI(
     temperature=0,
-    model_name="gpt-4o-mini",
-    openai_api_key=openai_api_key,
+    model_name="gpt-4.1-mini",
 )
 
 # 3. 에이전트가 사용할 도구들 초기화
@@ -72,7 +71,12 @@ tools = [search_tool, math_tool]
 # 4. ReAct 에이전트와 실행기 생성
 # verbose=True로 설정하여 에이전트의 추론 과정을 출력합니다.
 agent = create_react_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    handle_parsing_errors=True
+)
 
 # 5. 대화 기록을 저장할 리스트 초기화
 chat_history = []
@@ -80,8 +84,8 @@ chat_history = []
 # 6. 대화 루프 실행
 while True:
     # 6-1. 사용자 입력 받기
-    user_input = input("\n\n당신 (종료 q): ")
-    if user_input.lower() in ("끝", "q", "exit"):
+    user_input = input("질문을 입력하세요 (종료: exit): ")
+    if user_input.lower() == "exit":
         break
 
     # 6-2. 에이전트 실행 및 응답 생성
@@ -94,5 +98,5 @@ while True:
 
     # 6-3. 대화 기록 업데이트
     # 사용자 입력과 AI 응답을 순서대로 저장합니다.
-    chat_history.append(f"user: {user_input}")
-    chat_history.append(f"assistant: {output_text}")
+    chat_history.append(HumanMessage(content=user_input))
+    chat_history.append(AIMessage(content=output_text))

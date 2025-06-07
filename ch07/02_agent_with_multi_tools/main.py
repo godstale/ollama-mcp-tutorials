@@ -7,6 +7,7 @@ from langchain.agents.react.agent import create_react_agent
 from langchain.chains.llm_math.base import LLMMathChain
 from langchain.agents import Tool
 from langchain.agents.agent import AgentExecutor
+from langchain_core.messages import HumanMessage, AIMessage
 
 # 환경 변수 로드 (.env 파일에서 API 키 등을 로드)
 load_dotenv()
@@ -94,5 +95,5 @@ while True:
 
     # 6-3. 대화 기록 업데이트
     # 사용자 입력과 AI 응답을 순서대로 저장합니다.
-    chat_history.append(f"user: {user_input}")
-    chat_history.append(f"assistant: {output_text}")
+    chat_history.append(HumanMessage(content=user_input))
+    chat_history.append(AIMessage(content=output_text))

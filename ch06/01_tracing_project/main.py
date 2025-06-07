@@ -18,7 +18,9 @@ VECTOR_DB_PATH = "faiss_index"
 # 1. 벡터 DB 파일이 없으면 생성 후 vector_store 리턴
 def create_vector_db():
     # 1-1. 문서 로딩 (Document Loading)
-    loader = PyPDFLoader("C:\\Workspace\\news_weather.pdf")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    pdf_path = os.path.join(current_dir, "news_weather.pdf")
+    loader = PyPDFLoader(pdf_path)
     docs = loader.load()
     print(f"문서의 수: {len(docs)}")
 

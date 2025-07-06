@@ -91,12 +91,12 @@ def route_tools(
     return END
 
 
-# 6. 그래프 생성
-# 6-1. 그래프 노드 추가
+# 7. 그래프 생성
+# 7-1. 그래프 노드 추가
 graph_builder.add_node("chatbot", chatbot)
 graph_builder.add_node("tools", tool_node)
 
-# 6-2. 그래프 엣지 추가
+# 7-2. 그래프 엣지 추가
 graph_builder.add_edge(START, "chatbot")
 graph_builder.add_conditional_edges(
     "chatbot",
@@ -107,14 +107,14 @@ graph_builder.add_conditional_edges(
 graph_builder.add_edge("tools", "chatbot")
 graph_builder.add_edge("chatbot", END)
 
-# 6-3. 그래프 컴파일
+# 7-3. 그래프 컴파일
 graph = graph_builder.compile()
 
-# 7. 그래프 시각화
+# 8. 그래프 시각화
 try:
-    # 그래프를 PNG 파일로 저장
+    # 8-1. 그래프를 PNG 파일로 저장
     png_data = graph.get_graph(xray=True).draw_mermaid_png()
-    # 현재 작업 디렉토리에 'graph.png' 파일로 저장
+    # 8-2. 현재 작업 디렉토리에 'graph.png' 파일로 저장
     file_path = os.path.join(os.getcwd(), "graph.png")
     with open(file_path, "wb") as f:
         f.write(png_data)
@@ -123,10 +123,10 @@ except Exception as e:
     print(f"An error occurred: {e}")
 
 
-# 8. 챗봇 실행
+# 9. 챗봇 실행
 while True:
     try:
-        # 8-1. 사용자 입력 받기
+        # 9-1. 사용자 입력 받기
         user_input = input("질문을 입력하세요 (종료: exit): ")
         if user_input.lower() == "exit":
             break

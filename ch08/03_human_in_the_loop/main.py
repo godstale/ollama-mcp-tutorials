@@ -1,17 +1,16 @@
-import json
 import os
+import uuid
 from typing import Annotated
 
 from dotenv import load_dotenv
 from langchain.agents import Tool
 from langchain.chat_models import init_chat_model
 from langchain_community.tools.tavily_search.tool import TavilySearchResults
-from langchain_core.messages import ToolMessage
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.prebuilt import ToolNode
 from langgraph.types import Command, interrupt
 from typing_extensions import TypedDict
 
@@ -122,44 +121,51 @@ while True:
         user_input = input("질문을 입력하세요 (종료: exit): ")
         if user_input.lower() == "exit":
             break
-        # 8-2. 그래프 실행 및 결과 출력
-        config = {"configurable": {"thread_id": "2131231"}}
-        # 8-3. 그래프 실행 및 결과 출력
+        # 매번 새로운 thread_id 생성
+        config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+        # 8-3. 그래프 실행
         graph_stream = graph.stream(
             {"messages": [{"role": "user", "content": user_input}]},
             config=config,
             stream_mode="values",
         )
-        for event in graph_stream:
-            if "messages" in event:
-                last_msg = event["messages"][-1]
-                last_msg.pretty_print()
+        keep_running = True
+        tool_call_id = None
 
-                # human_assistance 도구의 interrupt 신호 감지
-                if (
-                    hasattr(last_msg, "tool_calls")
-                    and isinstance(last_msg.tool_calls, list)
-                    and any(
-                        tc["name"] == "human_assistance" for tc in last_msg.tool_calls
-                    )
-                ):
-                    # 첫 번째 human_assistance 도구 호출 가져오기
-                    tool_call = next(
-                        tc
-                        for tc in last_msg.tool_calls
-                        if tc["name"] == "human_assistance"
-                    )
-                    tool_call_id = tool_call["id"]
+        # 8-4. 그래프 실행 결과 출력 및 인터럽트 처리
+        while keep_running:
+            keep_running = False
+            for event in graph_stream:
+                if "messages" in event:
+                    # 마지막 메시지 출력
+                    last_msg = event["messages"][-1]
+                    last_msg.pretty_print()
 
-                    # 사용자 입력 요청
-                    human_input = input("🧑 입력해주세요: ")
+                    # human_assistance 도구의 인터럽트 감지
+                    if (
+                        hasattr(last_msg, "tool_calls")
+                        and isinstance(last_msg.tool_calls, list)
+                        and len(last_msg.tool_calls) > 0
+                        and last_msg.tool_calls[0]["name"] == "human_assistance"
+                        and tool_call_id != last_msg.tool_calls[0]["id"]
+                    ):
+                        # 첫 번째 human_assistance 도구 호출 가져오기
+                        tool_call_id = last_msg.tool_calls[0]["id"]
 
-                    # 그래프 resume
-                    command = Command(resume={"data": human_input})
-                    for event in graph.stream(command, config, stream_mode="values"):
-                        if "messages" in event:
-                            last_msg = event["messages"][-1]
-                            last_msg.pretty_print()
+                        # 사용자 입력 요청
+                        human_input = input("🧑 사용자 정보를 입력해주세요: ")
+
+                        # 그래프 resume
+                        command = Command(
+                            resume={"tool_call_id": tool_call_id, "data": human_input}
+                        )
+                        # 그래프 재실행
+                        graph_stream = graph.stream(
+                            command, config, stream_mode="values"
+                        )
+                        # 새로 생성된 graph_stream 처리를 위해 현재 for 루프 종료 후 재실행행
+                        keep_running = True
+                        break
 
     except Exception as e:
         print(f"Error while running the chatbot: {e}")

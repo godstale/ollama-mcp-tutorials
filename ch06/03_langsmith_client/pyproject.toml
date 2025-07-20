@@ -1,0 +1,11 @@
+[project]
+name = "ollama-mcp-tutorial"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-core==0.3.61",
+    "langchain-ollama==0.3.3",
+    "langchain==0.3.25",
+    "python-dotenv",
+    "langchain-community"
+]

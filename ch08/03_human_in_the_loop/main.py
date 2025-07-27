@@ -35,7 +35,7 @@ search_tool = Tool(
 # 2-2. 사용자 입력 도구
 @tool
 def human_assistance(query: str) -> str:
-    """사용자의 입력이 필요한 경우 이 도구를 호출하여 도움을 요청합니다."""
+    """사용자의 입력이 필요한 경우 이 도구를 호출하여 도움을 요청합니다. query는 사용자에게 전달할 메시지입니다."""
     human_response = interrupt({"query": query})
     return human_response["data"]
 
@@ -79,12 +79,12 @@ def route_tools(
     return END
 
 
-# 6. 그래프 생성
-# 6-1. 그래프 노드 추가
+# 7. 그래프 생성
+# 7-1. 그래프 노드 추가
 graph_builder.add_node("chatbot", chatbot)
 graph_builder.add_node("tools", tool_node)
 
-# 6-2. 그래프 엣지 추가
+# 7-2. 그래프 엣지 추가
 graph_builder.add_edge(START, "chatbot")
 graph_builder.add_conditional_edges(
     "chatbot",
@@ -95,13 +95,13 @@ graph_builder.add_conditional_edges(
 graph_builder.add_edge("tools", "chatbot")
 graph_builder.add_edge("chatbot", END)
 
-# 6-3. 메모리 초기화
+# 7-3. 메모리 초기화
 memory = MemorySaver()
 
-# 6-4. 그래프 컴파일
+# 7-4. 그래프 컴파일
 graph = graph_builder.compile(checkpointer=memory)
 
-# 7. 그래프 시각화
+# 8. 그래프 시각화
 try:
     # 그래프를 PNG 파일로 저장
     png_data = graph.get_graph(xray=True).draw_mermaid_png()
@@ -114,25 +114,26 @@ except Exception as e:
     print(f"An error occurred: {e}")
 
 
-# 8. 챗봇 실행
+# 9. 챗봇 실행
 while True:
     try:
-        # 8-1. 사용자 입력 받기
+        # 9-1. 사용자 입력 받기
         user_input = input("질문을 입력하세요 (종료: exit): ")
         if user_input.lower() == "exit":
             break
-        # 매번 새로운 thread_id 생성
+        # 9-2. 매번 새로운 thread_id 생성 (채팅 초기화)
         config = {"configurable": {"thread_id": str(uuid.uuid4())}}
-        # 8-3. 그래프 실행
+        # 9-3. 그래프 실행
         graph_stream = graph.stream(
             {"messages": [{"role": "user", "content": user_input}]},
             config=config,
+            # stream_mode="values"는 각 단계의 최종 상태 객체를 반환
             stream_mode="values",
         )
         keep_running = True
         tool_call_id = None
 
-        # 8-4. 그래프 실행 결과 출력 및 인터럽트 처리
+        # 9-4. 그래프 실행 결과 출력 및 인터럽트 처리
         while keep_running:
             keep_running = False
             for event in graph_stream:
@@ -149,11 +150,12 @@ while True:
                         and last_msg.tool_calls[0]["name"] == "human_assistance"
                         and tool_call_id != last_msg.tool_calls[0]["id"]
                     ):
-                        # 첫 번째 human_assistance 도구 호출 가져오기
-                        tool_call_id = last_msg.tool_calls[0]["id"]
+                        # 중복실행 방지를 위해 도구 ID를 기억
+                        tool_call = last_msg.tool_calls[0]
+                        tool_call_id = tool_call["id"]
 
                         # 사용자 입력 요청
-                        human_input = input("🧑 사용자 정보를 입력해주세요: ")
+                        human_input = input(tool_call["args"]["query"] + ": ")
 
                         # 그래프 resume
                         command = Command(
@@ -163,7 +165,7 @@ while True:
                         graph_stream = graph.stream(
                             command, config, stream_mode="values"
                         )
-                        # 새로 생성된 graph_stream 처리를 위해 현재 for 루프 종료 후 재실행행
+                        # 새로 생성된 graph_stream 처리를 위해 현재 for 루프 종료 후 재실행
                         keep_running = True
                         break
 

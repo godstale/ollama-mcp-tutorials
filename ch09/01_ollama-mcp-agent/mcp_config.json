@@ -1,0 +1,22 @@
+{
+    "mcpServers": {
+        "weather": {
+            "command": "python",
+            "args": ["./mcp_server/mcp_server_weather.py"],
+            "transport": "stdio"
+        },
+        "desktop-commander": {
+            "command": "cmd",
+            "args": [
+              "/c",
+              "npx",
+              "-y",
+              "@smithery/cli@latest",
+              "run",
+              "@wonderwhy-er/desktop-commander",
+              "--key",
+              "your-key"
+            ]
+          }
+    }
+}

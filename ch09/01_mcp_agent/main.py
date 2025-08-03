@@ -22,11 +22,11 @@ from typing_extensions import TypedDict
 # 환경 변수 로드 (.env 파일에서 API 키 등을 로드)
 load_dotenv()
 
-DEFAULT_TEMPERATURE = 0.1
+DEFAULT_TEMPERATURE = 0.3
 MODEL_QWEN3 = "qwen3:8b"
 MODEL_OPENAI = "gpt-4.1-mini"
-AGENT_SUPERVISOR = "Supervisor"
-AGENT_COMMON = "Common"
+NODE_SUPERVISOR = "Supervisor"
+NODE_COMMON = "Common"
 
 
 # 1. 상태 클래스 정의
@@ -67,7 +67,7 @@ async def supervisor(state: AgentState):
     if "NEXT_AGENT:" in response.content:
         try:
             next_agent = response.content.split("NEXT_AGENT:")[-1].strip()
-            if next_agent not in [AGENT_COMMON, "END"]:
+            if next_agent not in [NODE_COMMON, "END"]:
                 next_agent = "END"
             print(f"[Supervisor] 다음 에이전트 결정: {next_agent}")
         except:
@@ -96,15 +96,15 @@ def build_graph(common_mcp_tools):
     graph_builder = StateGraph(AgentState)
 
     # 노드 추가
-    graph_builder.add_node(AGENT_SUPERVISOR, supervisor)
-    graph_builder.add_node(AGENT_COMMON, common_agent)
+    graph_builder.add_node(NODE_SUPERVISOR, supervisor)
+    graph_builder.add_node(NODE_COMMON, common_agent)
 
     # 엣지 추가
-    graph_builder.add_edge(START, AGENT_SUPERVISOR)
+    graph_builder.add_edge(START, NODE_SUPERVISOR)
     graph_builder.add_conditional_edges(
-        AGENT_SUPERVISOR, route_agent, {AGENT_COMMON: AGENT_COMMON, "END": END}
+        NODE_SUPERVISOR, route_agent, {NODE_COMMON: NODE_COMMON, "END": END}
     )
-    graph_builder.add_edge(AGENT_COMMON, END)
+    graph_builder.add_edge(NODE_COMMON, END)
 
     # 그래프 컴파일
     graph = graph_builder.compile(checkpointer=memory)
@@ -124,6 +124,7 @@ def build_graph(common_mcp_tools):
     return graph
 
 
+# 6. 메인 함수
 async def async_main():
     # 대화 스레드 ID 설정: 이 ID를 기준으로 메모리가 저장되고 로드
     thread_id = str(uuid.uuid4())
@@ -155,12 +156,12 @@ async def async_main():
         )
 
         while True:
-            # 10-1. 사용자 입력 받기
+            # 사용자 입력 받기
             user_input = input("질문을 입력하세요 (종료: exit): ")
             if user_input.lower() == "exit":
                 break
 
-            # 10-2. 그래프 비동기 스트리밍 실행
+            # 그래프 비동기 스트리밍 실행
             try:
                 print("\n=== 그래프 실행 시작 ===")
                 async for event in graph.astream(
@@ -179,9 +180,9 @@ async def async_main():
 
                         # 노드 이름에 따라 다른 출력 형식 사용
                         if hasattr(last_message, "name"):
-                            if last_message.name == AGENT_SUPERVISOR:
+                            if last_message.name == NODE_SUPERVISOR:
                                 print(f"\n[Supervisor] {last_message.content}")
-                            elif last_message.name == AGENT_COMMON:
+                            elif last_message.name == NODE_COMMON:
                                 print(f"\n[Common Agent] {last_message.content}")
                             else:
                                 print(f"\n[{last_message.name}] {last_message.content}")

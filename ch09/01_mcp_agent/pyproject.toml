@@ -1,5 +1,5 @@
 [project]
-name = "ollama-mcp-agent"
+name = "mcp_agent"
 version = "0.1.0"
 description = "LangGraph Agent with MCP Adapters"
 readme = "README.md"
@@ -7,7 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "dotenv>=0.9.9",
     "langchain-core>=0.1.17",
-    "langchain-google-genai>=2.1.2",
     "langchain-mcp-adapters>=0.0.5",
     "langchain-ollama>=0.1.1",
     "langchain-openai",
@@ -21,12 +20,6 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["mcp_server"]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 

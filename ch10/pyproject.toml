@@ -1,0 +1,21 @@
+[project]
+name = "meeting-notes-pipeline"
+version = "0.1.0"
+description = "AI 기반 회의록 자동 생성 시스템"
+dependencies = [
+    "langchain>=0.1.12",
+    "langchain-community>=0.0.27", 
+    "langchain-ollama>=0.0.1",
+    "faster-whisper",
+    "notion-client>=2.2.1",
+    "python-dotenv>=1.0.1",
+    "requests>=2.31.0"
+]
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["main", "pipeline", "audio_transcriber", "meeting_summarizer"]

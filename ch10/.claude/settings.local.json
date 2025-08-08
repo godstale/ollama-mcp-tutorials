@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip:*)",
+      "Bash(powershell:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv:*)",
+      "Bash(python:*)",
+      "Bash(rm:*)",
+      "Bash(git -C .. log --oneline -10)",
+      "Bash(find:*)",
+      "Bash(git -C ../.. log --oneline -10)",
+      "Bash(git -C /c/Users/bginess/Dev/ollama-mcp-tutorials log --oneline -10)",
+      "Bash(git -C /c/Users/bginess/Dev/ollama-mcp-tutorials checkout -b feat/add-ch10-whisper-meeting-notes)",
+      "Bash(git -C /c/Users/bginess/Dev/ollama-mcp-tutorials status)",
+      "Bash(git -C /c/Users/bginess/Dev/ollama-mcp-tutorials add ch10/)"
+    ],
+    "deny": []
+  }
+}

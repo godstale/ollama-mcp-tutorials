@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "weather": {
+        "command": "python",
+        "args": ["./mcp_server/mcp_server_weather.py"],
+        "transport": "stdio"
+    },
+    "notion": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery/notion",
+        "--key",
+        "e4795064-5d2c-4246-9759-46e47515a9bf",
+        "--profile",
+        "mere-wildfowl-Gjlj4R"
+      ]
+    }
+  }
+}

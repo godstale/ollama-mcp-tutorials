@@ -14,8 +14,8 @@ This repository contains example code for an AI agent programming guide using La
 - **ch07**: Tool-enabled agents
 - **ch08**: Multi-agent systems with LangGraph
 - **ch09**: MCP protocol integration
-- **ch10**: Real-world application (meeting transcription)
-- **ch11**: Advanced MCP use cases
+- **ch10**: Advanced MCP use cases
+- **ch11**: Real-world application (meeting transcription)
 
 ## Development Commands
 
@@ -24,7 +24,7 @@ Each chapter contains independent Python projects with their own dependencies:
 
 ```bash
 # Navigate to any chapter/project directory
-cd ch10  # or ch09/01_mcp_agent, etc.
+cd ch11  # or ch09/01_mcp_agent, etc.
 
 # Install dependencies
 uv sync
@@ -32,7 +32,7 @@ uv sync
 # Run the main script
 uv run python main.py
 
-# For projects with CLI arguments (like ch10)
+# For projects with CLI arguments (like ch11)
 uv run python main.py --audio-path path/to/audio.mp3 --save
 ```
 
@@ -72,13 +72,13 @@ Most chapters follow this structure:
 - Conditional routing between specialized agents
 - Memory persistence with checkpointers
 
-#### 3. MCP (Model Context Protocol) Integration (ch09-ch11)
+#### 3. MCP (Model Context Protocol) Integration (ch09-ch10)
 - `mcp_manager.py` - MCP client lifecycle management
 - `mcp_config.json` - Server configuration
 - `langchain_mcp_adapters` for tool integration
 - Async patterns for MCP communication
 
-#### 4. Audio Processing Pipeline (ch10)
+#### 4. Audio Processing Pipeline (ch11)
 - Modular pipeline: `AudioTranscriber` → `MeetingSummarizer`
 - Uses `faster-whisper` for speech recognition
 - Structured output generation with LLM prompts
@@ -139,13 +139,15 @@ Most chapters follow this structure:
 - Supervisor pattern for agent coordination
 - Graph visualization capabilities
 
-### ch09-ch11: MCP Integration
+### ch09-ch10: MCP Integration
 - Require proper MCP server configuration in `mcp_config.json`
 - Use async/await patterns throughout
 - Handle MCP client lifecycle carefully
 - **ch09**: Basic MCP agent with weather tools
-- **ch10**: Real-world meeting transcription pipeline
-- **ch11**: Advanced MCP integrations (Notion, news aggregation)
+- **ch10**: Advanced MCP integrations (Notion, news aggregation)
+
+### ch11: Real-world Application
+- **ch11**: Real-world meeting transcription pipeline
 
 ## Learning Path Recommendations
 
@@ -153,4 +155,5 @@ Most chapters follow this structure:
 2. **Progress through ch04-ch05** for foundational patterns
 3. **Use ch06** to understand observability early in development
 4. **Explore ch07-ch08** for agent architectures
-5. **Advance to ch09-ch11** for cutting-edge MCP integration
+5. **Advance to ch09-ch10** for cutting-edge MCP integration
+6. **Complete with ch11** for real-world application implementation

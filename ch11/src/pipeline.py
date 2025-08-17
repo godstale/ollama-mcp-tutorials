@@ -155,41 +155,13 @@ class MeetingNotesPipeline:
         state["output_path"] = output_path
         return state
     
-    def run(self, audio_path: str, verbose: bool = True) -> Dict[str, Any]:
-        """전체 파이프라인 실행: 전사 → 요약 → 파일 저장
-        
-        Args:
-            audio_path: 음성 파일 경로
-            verbose: 진행 메시지 출력 여부
-            
-        Returns:
-            전사 내용과 요약을 포함한 딕셔너리
-            
-        Raises:
-            FileNotFoundError: 음성 파일이 존재하지 않을 경우
-        """
-        # 초기 상태 구성
-        initial_state = MeetingState(
-            audio_path=audio_path,
-            transcript="",
-            summary="",
-            result={},
-            output_path="",
-            verbose=verbose
-        )
-        
-        # 워크플로우 실행
-        final_state = self.graph.invoke(initial_state)
-        
-        return final_state["result"]
-    
-    def process_and_save(
+    def run(
         self, 
         audio_path: str, 
         output_path: str = None,
         verbose: bool = True
-    ) -> str:
-        """음성 처리 후 결과를 파일로 저장
+    ) -> Dict[str, Any]:
+        """전체 파이프라인 실행: 전사 → 요약 → 파일 저장
         
         Args:
             audio_path: 음성 파일 경로
@@ -197,7 +169,10 @@ class MeetingNotesPipeline:
             verbose: 진행 메시지 출력 여부
             
         Returns:
-            저장된 출력 파일 경로
+            전사 내용, 요약, 저장된 파일 경로를 포함한 딕셔너리
+            
+        Raises:
+            FileNotFoundError: 음성 파일이 존재하지 않을 경우
         """
         # 초기 상태 구성
         initial_state = MeetingState(
@@ -212,4 +187,8 @@ class MeetingNotesPipeline:
         # 워크플로우 실행
         final_state = self.graph.invoke(initial_state)
         
-        return final_state["output_path"]
+        # 결과에 출력 경로 추가
+        result = final_state["result"].copy()
+        result["output_path"] = final_state["output_path"]
+        
+        return result

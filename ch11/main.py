@@ -41,11 +41,6 @@ def main() -> None:
         help="결과 저장 파일 경로 (기본값: 자동 생성)"
     )
     
-    parser.add_argument(
-        "--save",
-        action="store_true",
-        help="결과를 파일로 저장"
-    )
     
     args = parser.parse_args()
     
@@ -57,14 +52,7 @@ def main() -> None:
         )
         
         # 3. 처리 실행
-        if args.save:
-            output_file = pipeline.process_and_save(
-                args.audio_path, 
-                args.output
-            )
-            print(f"\n[성공] 회의록이 저장되었습니다: {output_file}")
-        else:
-            pipeline.run(args.audio_path)
+        pipeline.run(args.audio_path)
             
     except FileNotFoundError as e:
         print(f"[오류] 파일을 찾을 수 없습니다: {e}")

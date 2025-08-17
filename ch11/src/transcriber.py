@@ -19,7 +19,7 @@ class AudioTranscriber:
         
         Args:
             model_size: Whisper 모델 크기 ("tiny", "base", "small", "medium", "large")
-            device: 실행할 장치 ("cpu" 또는 "cuda")
+            device: 실행할 장치 ("cpu")
             compute_type: 계산 정밀도 ("int8", "int16", "float16", "float32")
         """
         self.model_size = model_size
@@ -60,7 +60,7 @@ class AudioTranscriber:
         
         # 3. 음성 파일 변환 시작
         print(f"음성 파일 변환 중: {audio_file.name}")
-        print(f"사용 모델: {self.model_size}, 장치: {self.device}")
+        print(f"사용 모델: {self.model_size}")
         
         # 4. 전사 실행
         segments, _ = self._model.transcribe(str(audio_file), language=language)

@@ -20,6 +20,7 @@ dependencies = [
     "langchain>=0.1.12",
     "langchain-community>=0.0.27", 
     "langchain-ollama>=0.0.1",
+    "langgraph>=0.0.40",
     "faster-whisper>=1.0.0",
     "notion-client>=2.2.1",
     "python-dotenv>=1.0.1",

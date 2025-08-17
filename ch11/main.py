@@ -62,14 +62,14 @@ def main() -> None:
                 args.audio_path, 
                 args.output
             )
-            print(f"\n✅ 회의록이 저장되었습니다: {output_file}")
+            print(f"\n[성공] 회의록이 저장되었습니다: {output_file}")
         else:
             pipeline.run(args.audio_path)
             
     except FileNotFoundError as e:
-        print(f"❌ 파일을 찾을 수 없습니다: {e}")
+        print(f"[오류] 파일을 찾을 수 없습니다: {e}")
     except Exception as e:
-        print(f"❌ 오류가 발생했습니다: {str(e)}")
+        print(f"[오류] 오류가 발생했습니다: {str(e)}")
 
 
 if __name__ == "__main__":

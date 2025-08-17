@@ -146,13 +146,52 @@ Most chapters follow this structure:
 - **ch09**: Basic MCP agent with weather tools
 - **ch10**: Advanced MCP integrations (Notion, news aggregation)
 
-### ch11: Real-world Application
-- **ch11**: Real-world meeting transcription pipeline
+### ch11: Real-world Application  
+- **ch11**: Meeting transcription system using LangGraph workflows
+- Features audio processing pipeline with structured state management
+- Implements modular components: transcriber, summarizer, file handler
+- Uses Faster Whisper for speech-to-text and Ollama for summarization
+
+## Development Commands by Chapter
+
+### Chapter 11 (Current - Meeting Notes Pipeline)
+```bash
+# Navigate to ch11 directory
+cd ch11
+
+# Install dependencies 
+uv sync
+
+# Run with default sample audio
+uv run python main.py
+
+# Process custom audio file with save
+uv run python main.py --audio-path path/to/audio.mp3 --save
+
+# Specify output location
+uv run python main.py --audio-path input.mp3 --output meeting_notes.md --save
+
+# Use different Whisper model size
+uv run python main.py --model-size large --llm-model llama3:8b
+
+# Development tools (when available)
+uv run black .
+uv run isort .
+uv run mypy .
+```
+
+### Code Style Guidelines
+Ch11 follows specific Korean coding conventions defined in `coding_rules.md`:
+- Comments and user interface in Korean
+- Snake_case for variables/functions, PascalCase for classes
+- Structured error handling with Korean error messages
+- F-string formatting preferred for all string interpolation
+- Sequential step numbering in comments (`# 1.`, `# 2.`, etc.)
 
 ## Learning Path Recommendations
 
 1. **Start with ch03** for basic LangChain concepts
-2. **Progress through ch04-ch05** for foundational patterns
+2. **Progress through ch04-ch05** for foundational patterns  
 3. **Use ch06** to understand observability early in development
 4. **Explore ch07-ch08** for agent architectures
 5. **Advance to ch09-ch10** for cutting-edge MCP integration

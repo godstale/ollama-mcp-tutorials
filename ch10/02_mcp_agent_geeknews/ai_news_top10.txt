@@ -1,0 +1,29 @@
+긱뉴스 오늘 인공지능 관련 뉴스 (중요도 순 상위 10개)
+
+1. 프로덕션 AI 에이전트를 위한 6가지 원칙
+   링크: https://www.app.build/blog/six-principles-production-ai-agents
+   점수: 24
+
+2. AI로 직접 만든 툴로 고가 소프트웨어를 대체한 사람들의 이야기
+   링크: https://every.to/p/i-found-12-people-who-ditched-their-expensive-software-for-ai-built-tools
+   점수: 23
+
+3. Every의 GPT-5 핸즈온 리뷰
+   링크: https://every.to/vibe-check/gpt-5
+   점수: 9
+
+4. GPT-5 공개
+   링크: https://openai.com/gpt-5/
+   점수: 8
+
+5. OpenAI, 6년만의 오픈소스 LLM, GPT-OSS 공개
+   링크: https://openai.com/index/introducing-gpt-oss
+   점수: 31
+
+6. LangChain의 DeepAgents 프레임워크
+   링크: https://blog.langchain.com/deep-agents/
+   점수: 14
+
+7. Kitten TTS - CPU만으로 동작하는 25MB 오픈소스 TTS 모델
+   링크: https://github.com/KittenML/KittenTTS
+   점수: 16

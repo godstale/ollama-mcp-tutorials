@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "geeknews-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@the0807/geeknews-mcp-server",
+        "--key",
+        "e4795064-5d2c-4246-9759-46e47515a9bf"
+      ]
+    },
+    "notion": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery/notion",
+        "--key",
+        "e4795064-5d2c-4246-9759-46e47515a9bf",
+        "--profile",
+        "mere-wildfowl-Gjlj4R"
+      ]
+    }
+  }
+}

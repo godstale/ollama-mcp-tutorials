@@ -1,0 +1,25 @@
+[project]
+name = "mcp_agent"
+version = "0.1.0"
+description = "LangGraph Agent with MCP Adapters"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dotenv>=0.9.9",
+    "langchain-core>=0.1.17",
+    "langchain-mcp-adapters>=0.0.5",
+    "langchain-ollama>=0.1.1",
+    "langchain-openai",
+    "langgraph>=0.0.15",
+    "langgraph-checkpoint>=2.0.23",
+    "langgraph-prebuilt>=0.1.7",
+    "mcp>=1.6.0",
+    "nest-asyncio>=1.5.8",
+    "pydantic>=2.11.0",
+    "typing-extensions>=4.13.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+

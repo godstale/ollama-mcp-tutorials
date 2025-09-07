@@ -1,5 +1,7 @@
 # AI Agent Programming Guide: LangChain & LangGraph with MCP
 
+**한국어** | [English](#english)
+
 LangChain과 LangGraph를 활용한 AI 에이전트 프로그래밍 가이드입니다. 기본적인 Ollama 챗봇부터 고급 MCP(Model Context Protocol) 기반 멀티 에이전트 시스템까지 단계별로 학습할 수 있습니다.
 
 ## 📚 프로젝트 구성
@@ -176,3 +178,186 @@ export TAVILY_API_KEY="your-tavily-key"
 ## 📄 라이선스
 
 이 프로젝트는 교육 목적으로 제공되며, 각 챕터의 LICENSE 파일을 참고하세요.
+
+---
+
+# English
+
+## AI Agent Programming Guide: LangChain & LangGraph with MCP
+
+A comprehensive guide for AI agent programming using LangChain and LangGraph. Learn step-by-step from basic Ollama chatbots to advanced MCP (Model Context Protocol) based multi-agent systems.
+
+## 📚 Project Structure
+
+### Learning Roadmap
+- **ch03**: Basic LangChain concepts with Ollama integration
+- **ch04**: Prompt engineering and chat history
+- **ch05**: RAG (Retrieval-Augmented Generation) implementation
+- **ch06**: Observability and tracing with LangSmith
+- **ch07**: Tool-enabled agents
+- **ch08**: Multi-agent systems with LangGraph
+- **ch09**: MCP protocol integration
+- **ch10**: Advanced MCP use cases
+- **ch11**: Real-world application (meeting transcription)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+1. **Python 3.10+** (some projects require 3.12+)
+2. **UV Package Manager**
+   ```bash
+   # macOS/Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   
+   # Windows
+   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+   ```
+
+3. **Ollama Installation & Setup**
+   ```bash
+   # Install Ollama (https://ollama.com/download)
+   # Download models
+   ollama pull qwen2.5:7b
+   ollama pull llama3:8b
+   ```
+
+### Running Projects
+
+Each chapter contains independent Python projects:
+
+```bash
+# Navigate to desired chapter/project directory
+cd ch11  # or ch09/01_mcp_agent, etc.
+
+# Install dependencies
+uv sync
+
+# Run main script
+uv run python main.py
+
+# For projects with CLI arguments (like ch11)
+uv run python main.py --audio-path path/to/audio.mp3 --save
+```
+
+## 📋 Chapter Details
+
+### ch03-ch05: Foundation Concepts
+- **ch03**: Ollama integration, streaming, output parsing
+- **ch04**: Prompt templates and conversation memory
+- **ch05**: Vector stores, embeddings, RAG patterns
+
+### ch06: Observability
+- LangSmith integration for tracing and monitoring
+- Dataset management and evaluation
+
+### ch07: Tool-Enabled Agents
+- Single and multi-tool agent implementations
+- ReAct pattern with LangChain agents
+
+### ch08: Multi-Agent Systems
+- Complex state routing logic
+- Supervisor pattern for agent coordination
+- Graph visualization capabilities
+
+### ch09-ch10: MCP Integration
+- Proper MCP server configuration in `mcp_config.json`
+- Async/await patterns throughout
+- Careful MCP client lifecycle handling
+- **ch09**: Basic MCP agent with weather tools
+- **ch10**: Advanced MCP integrations (Notion, news aggregation)
+
+### ch11: Real-World Application
+- Meeting transcription system using LangGraph workflows
+- Audio processing pipeline with structured state management
+- Modular components: transcriber, summarizer, file handler
+- Uses Faster Whisper for speech-to-text and Ollama for summarization
+
+## 🛠️ Development Tools (where available)
+
+```bash
+# Code formatting
+uv run black .
+uv run isort .
+
+# Type checking
+uv run mypy .
+
+# Testing
+uv run pytest
+```
+
+## 📝 Environment Setup (Optional)
+
+Environment variables needed for some projects:
+
+```bash
+# OpenAI API Key (for projects using GPT models)
+export OPENAI_API_KEY="your-api-key"
+
+# LangSmith API Key (for ch06 tracing)
+export LANGCHAIN_API_KEY="your-langsmith-key"
+
+# Tavily API Key (for ch08 web search tools)
+export TAVILY_API_KEY="your-tavily-key"
+```
+
+## 🎯 Recommended Learning Path
+
+1. **Start with ch03** - Basic LangChain concepts
+2. **Progress through ch04-ch05** - Foundation patterns
+3. **Use ch06** - Understand observability early in development
+4. **Explore ch07-ch08** - Agent architectures
+5. **Advance to ch09-ch10** - Cutting-edge MCP integration
+6. **Complete with ch11** - Real-world application implementation
+
+## 🔗 Colab Notebook Links
+
+Each chapter provides Google Colab notebooks for direct execution:
+
+### ch03
+- [01_simple_ollama_chat](https://colab.research.google.com/drive/1uh-K7fksjHmqx6OOyYo6zzhBGw0x4oj8?usp=drive_link)
+- [02_openai_chat](https://colab.research.google.com/drive/1ZVbVT9-KQbgsTaWx9RREUzbQd-GyQ8rz?usp=drive_link)
+- [03_stream_chat](https://colab.research.google.com/drive/15fO9pZxVATERvQ6G3JsQAKugEnWS587e?usp=drive_link)
+- [04_output_parser](https://colab.research.google.com/drive/1iVzHjd0ks0NkrWWYlknmx3xRRY1Etarb?usp=drive_link)
+- [05_lcel_chain](https://colab.research.google.com/drive/1y7_2eeIclEXnJCvq76Lnt8E67-d3DZ7s?usp=drive_link)
+
+### ch04
+- [01_prompt_template](https://colab.research.google.com/drive/1idJdPOPZTWEo-fakZ-w-3hY6Z4lbjpxt?usp=drive_link)
+- [02_chat_history](https://colab.research.google.com/drive/1ESs73muIOYoOwV1sj0munUbw2BOp8ctA?usp=drive_link)
+- [03_prompt_class](https://colab.research.google.com/drive/1iFh1h8uxc8Y4B3aWrOyxI2zji34Xxkr0?usp=drive_link)
+
+### ch05
+- [01_embedding](https://colab.research.google.com/drive/1gtLoi-JbTWI0lY_so1VWnJtau-1PjBgD?usp=drive_link)
+- [02_vector_store](https://colab.research.google.com/drive/1Cw_zIl4xY58khV4wynCcIxX3S-Ft4k1-?usp=drive_link)
+- [03_rag_news](https://colab.research.google.com/drive/1sk2wHyvjeWHepR1F62LubuVmuBM7fwS2?usp=drive_link)
+- [04_rag_pdf](https://colab.research.google.com/drive/1NrLleiSlNteqeA1QFbinGMnIkGhirKju?usp=drive_link)
+
+### ch06
+- [01_tracing_project](https://colab.research.google.com/drive/1Ma9TXuGB4aWI48gTs7Ui0NreFk7WpJiC?usp=drive_link)
+- [02_langchain_hub](https://colab.research.google.com/drive/1m08RYiWTD6T4XLjrW0ngEyg95DWBlsho?usp=drive_link)
+- [03_langsmith_client](https://colab.research.google.com/drive/1HvQL8H3W9q71o_zboot7gczICwJB7b59?usp=drive_link)
+
+### ch07
+- [01_agent_with_single_tool](https://colab.research.google.com/drive/1G8aOGbW4A-ESrp9DA322qllxGvgMWaTP?usp=drive_link)
+- [02_agent_with_multi_tools](https://colab.research.google.com/drive/1zusIXPlxS6DCBrrmg-imh8kVJSbqRF3G?usp=drive_link)
+
+### ch08
+- [01_basic_chatbot_graph](https://colab.research.google.com/drive/1ykdoFeBCTeYhRCZ-zhO3OCb9oPhIqQS2?usp=drive_link)
+- [02_add_tools](https://colab.research.google.com/drive/1yNsVUE52f7HaJl3_rH8yug6EDnQajuvq?usp=drive_link)
+- [03_human_in_the_loop](https://colab.research.google.com/drive/12NY85AIpmHrhs5VspoF9bQ53R4QshONt?usp=drive_link)
+- [04_multi_agent](https://colab.research.google.com/drive/1JWXJtnUQLUoMRPjfYkGG-iksMxb9_zOr?usp=drive_link)
+
+### ch09
+- [01_mcp_agent](https://colab.research.google.com/drive/1fEWiYHH_GtY_aJdKA3hYNVH7oGvOf-C2?usp=drive_link)
+
+### ch10
+- [01_mcp_agent_notion](https://colab.research.google.com/drive/1imW5JpO7FGOFLip7mWxZ7pHHIf60cfb9?usp=drive_link)
+- [02_mcp_agent_geeknews](https://colab.research.google.com/drive/1f1_tFv1jsZSWLxDz6oN2siGVfnkTMwMa?usp=drive_link)
+
+### ch11
+- [01_meeting_note_pipeline](https://colab.research.google.com/drive/18DWO81Du1VmWGFS7dodrmc5maU9XmV0U?usp=drive_link)
+
+## 📄 License
+
+This project is provided for educational purposes. Please refer to the LICENSE files in each chapter.

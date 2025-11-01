@@ -30,7 +30,7 @@ def create_vector_db():
     print(f"split size: {len(splits)}")
 
     # 1-3. 임베딩 생성 (Embedding)
-    embeddings = OllamaEmbeddings(model="qwen3:8b")
+    embeddings = OllamaEmbeddings(model="bge-m3")
 
     # 1-4. 벡터 저장소 구축 (Vector Database)
     vector_store = FAISS.from_documents(
@@ -47,7 +47,7 @@ def create_vector_db():
 # 2. 메인 로직
 if os.path.exists(VECTOR_DB_PATH):
     print("기존 벡터 DB를 로드합니다.")
-    embeddings = OllamaEmbeddings(model="qwen3:8b")
+    embeddings = OllamaEmbeddings(model="bge-m3")
     vector_store = FAISS.load_local(
         VECTOR_DB_PATH,
         embeddings,

@@ -1,15 +1,9 @@
 {
   "mcpServers": {
     "geeknews-mcp-server": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@the0807/geeknews-mcp-server",
-        "--key",
-        "e4795064-5d2c-4246-9759-46e47515a9bf"
-      ]
+      "command": "python",
+      "args": ["./mcp_server/main.py"],
+      "transport": "stdio"
     },
     "notion": {
       "command": "npx",

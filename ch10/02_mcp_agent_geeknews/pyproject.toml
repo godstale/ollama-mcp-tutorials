@@ -17,6 +17,9 @@ dependencies = [
     "nest-asyncio>=1.5.8",
     "pydantic>=2.11.0",
     "typing-extensions>=4.13.0",
+    "beautifulsoup4>=4.13.3",
+    "mcp[cli]>=1.6.0",
+    "requests>=2.32.3",
 ]
 
 [build-system]

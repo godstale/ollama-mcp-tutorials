@@ -1,5 +1,5 @@
 from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 # 1. LLM 모델 객체 생성
 llm = ChatOllama(model="qwen3:8b")

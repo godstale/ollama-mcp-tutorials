@@ -6,15 +6,14 @@ from typing import Annotated, Any, List, Optional
 
 import nest_asyncio
 from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.messages import HumanMessage, SystemMessage
 from langchain_core.tools import tool
 from langchain_ollama import ChatOllama
-from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.graph import CompiledGraph
 from langgraph.graph.message import add_messages
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 from mcp_manager import cleanup_mcp_client, initialize_mcp_client
 from mcp_prompt import MCP_CHAT_PROMPT, SUPERVISOR_PROMPT
 from typing_extensions import TypedDict
@@ -24,7 +23,6 @@ load_dotenv()
 
 DEFAULT_TEMPERATURE = 0.3
 MODEL_QWEN3 = "qwen3:8b"
-MODEL_OPENAI = "gpt-4.1-mini"
 NODE_SUPERVISOR = "Supervisor"
 NODE_COMMON = "Common"
 
@@ -37,19 +35,21 @@ class AgentState(TypedDict):
 
 # 2. 모델 초기화, 검색 및 편집 에이전트 생성
 # 2-1. 채팅 모델 생성: 도구 사용이 가능한 LLM 모델 필요
-# chat_model = ChatOllama(
-#     model=MODEL_QWEN3,
-#     temperature=DEFAULT_TEMPERATURE,
-# )
-chat_model = ChatOpenAI(model_name=MODEL_OPENAI, temperature=DEFAULT_TEMPERATURE)
+chat_model = ChatOllama(
+    model=MODEL_QWEN3,
+    temperature=DEFAULT_TEMPERATURE,
+)
+# chat_model = ChatOpenAI(model_name=MODEL_OPENAI, temperature=DEFAULT_TEMPERATURE)
 
 
 # 2-2. 에이전트 생성
-def create_agent(mcp_tools: Optional[List] = None) -> CompiledGraph:
-    # ReAct 에이전트 생성
-    react_agent = create_react_agent(model=chat_model, tools=mcp_tools)
-    print("ReAct agent created.")
-    return react_agent  # 에이전트 반환
+def create_common_agent(mcp_tools: Optional[List] = None) -> CompiledGraph:
+    # ReAct 에이전트 생성 (langchain.agents.create_agent 사용)
+    common_agent = create_agent(
+        model=chat_model, tools=mcp_tools, system_prompt=MCP_CHAT_PROMPT
+    )
+    print("Common agent created.")
+    return common_agent  # 에이전트 반환
 
 
 # 3. Supervisor 노드 정의
@@ -87,7 +87,7 @@ def route_agent(state: AgentState) -> str:
 # 5. 그래프 빌드
 def build_graph(common_mcp_tools):
     # 에이전트 생성 및 초기화
-    common_agent = create_agent(mcp_tools=common_mcp_tools)
+    common_agent = create_common_agent(mcp_tools=common_mcp_tools)
 
     # 메모리 초기화
     # memory = MemorySaver()
@@ -145,20 +145,9 @@ async def async_main():
         # 에이전트 생성 및 그래프 빌드
         graph = build_graph(mcp_tools)
 
-        # 도구 정보를 포맷팅하여 시스템 프롬프트 생성
-        tool_names = [tool.name for tool in mcp_tools] if mcp_tools else []
-        tools_description = (
-            "\n".join([f"- {tool.name}: {tool.description}" for tool in mcp_tools])
-            if mcp_tools
-            else "No tools available"
-        )
-        formatted_mcp_prompt = MCP_CHAT_PROMPT.format(
-            tools=tools_description, tool_names=", ".join(tool_names)
-        )
-
         while True:
             # 사용자 입력 받기
-            user_input = "긱뉴스에서 오늘 인공지능 관련 뉴스 중요도 순으로 5개 찾아서 나열해줘. 5개 뉴스는 링크뿐만 아니라 요약한 내용을 같이 표시해줘. 그리고 노션에 새 페이지 생성해서 답변 결과을 입력해줘. 새 페이지 제목과 내용을 블로그 포스트처럼 친근하게 작성해줘. 새 페이지 추가할 노션 데이터베이트 ID : 24acafed095681a8be96c93fc6dede04"
+            user_input = "긱뉴스에서 오늘 인공지능 관련 뉴스 중요도 순으로 5개 찾아서 나열해줘. 5개 뉴스는 링크뿐만 아니라 요약한 내용을 같이 표시해줘. 그리고 노션에 새 페이지 생성해서 답변 결과을 입력해줘. 새 페이지 제목과 내용을 블로그 포스트처럼 친근하게 작성해줘. 새 페이지 추가할 노션 데이터베이스트 ID : 24acafed095681a8be96c93fc6dede04"
             if user_input.lower() == "exit":
                 break
 
@@ -168,7 +157,6 @@ async def async_main():
                 async for event in graph.astream(
                     {
                         "messages": [
-                            ("system", formatted_mcp_prompt),
                             ("user", user_input),
                         ]
                     },

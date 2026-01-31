@@ -1,141 +1,96 @@
-import json
 import os
 from typing import Annotated
 
 from dotenv import load_dotenv
-from langchain.agents import Tool
-from langchain.chat_models import init_chat_model
-from langchain_community.tools.tavily_search.tool import TavilySearchResults
-from langchain_core.messages import ToolMessage
+from langchain_tavily import TavilySearch
+from langchain.messages import ToolMessage
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
 from typing_extensions import TypedDict
+from langchain_ollama import ChatOllama
 
-# 환경 변수 로드 (.env 파일에서 API 키 등을 로드)
+# .env 파일에서 환경 변수를 로드합니다.
 load_dotenv()
 
 
-# 1. 상태 클래스 정의
+# 1. 상태 클래스를 정의합니다.
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
 
-# 2. 도구 추가
-search_tool = Tool(
-    name="WebSearch",
-    func=TavilySearchResults().run,
-    description="This is a real-time web search tool (based on Tavily service)",
-)
-tools = [search_tool]
+# 2. 도구를 초기화합니다.
+# TavilySearch를 직접 도구 목록에 추가합니다.
+tools = [TavilySearch(max_results=2)]
+# ToolNode를 사용하여 도구 실행 노드를 생성합니다.
+tool_node = ToolNode(tools)
 
-# 3. 모델 초기화
-llm = init_chat_model("openai:gpt-4.1-mini")
+# 3. 모델을 초기화하고 도구를 바인딩합니다.
+llm = ChatOllama(model="qwen3:8b")
 llm_with_tools = llm.bind_tools(tools)
 
-# 4. 그래프 빌더 생성
+# 4. 그래프 빌더를 생성합니다.
 graph_builder = StateGraph(State)
 
 
-# 5. 노드 정의
-# 5-1. 챗봇 노드 정의 (모델 호출)
+# 5. 그래프 노드를 정의합니다.
+# 5-1. 챗봇 노드: 모델을 호출하여 응답을 생성합니다.
 def chatbot(state: State):
     return {"messages": [llm_with_tools.invoke(state["messages"])]}
 
 
-# 5-2. 도구 노드 정의
-class BasicToolNode:
-    """도구 호출을 처리하는 노드"""
-
-    def __init__(self, tools: list) -> None:
-        self.tools_by_name = {tool.name: tool for tool in tools}
-
-    def __call__(self, inputs: dict):
-        if messages := inputs.get("messages", []):
-            message = messages[-1]
-        else:
-            raise ValueError("No message found in input")
-        outputs = []
-        for tool_call in message.tool_calls:
-            tool_result = self.tools_by_name[tool_call["name"]].invoke(
-                tool_call["args"]
-            )
-            outputs.append(
-                ToolMessage(
-                    content=json.dumps(tool_result),
-                    name=tool_call["name"],
-                    tool_call_id=tool_call["id"],
-                )
-            )
-        return {"messages": outputs}
-
-
-tool_node = BasicToolNode(tools=tools)
-
-
-# 6. 도구 노드 라우팅
-def route_tools(
-    state: State,
-):
-    """
-    메시지에 tool_calls가 있으면 "tools"로 라우팅, 없으면 END로 라우팅
-    """
+# 5-2. 도구 라우팅 로직: 모델의 응답에 tool_calls가 있는지 확인합니다.
+def route_tools(state: State):
     if isinstance(state, list):
         ai_message = state[-1]
     elif messages := state.get("messages", []):
         ai_message = messages[-1]
     else:
         raise ValueError(f"No messages found in input state to tool_edge: {state}")
-    # 도구 호출인 경우 "tools"를 리턴, 아니면 END를 리턴
+
     if hasattr(ai_message, "tool_calls") and len(ai_message.tool_calls) > 0:
         return "tools"
     return END
 
 
-# 7. 그래프 생성
-# 7-1. 그래프 노드 추가
+# 6. 그래프를 구성합니다.
 graph_builder.add_node("chatbot", chatbot)
 graph_builder.add_node("tools", tool_node)
 
-# 7-2. 그래프 엣지 추가
 graph_builder.add_edge(START, "chatbot")
 graph_builder.add_conditional_edges(
     "chatbot",
     route_tools,
-    # route_tools 함수의 출력에 따라 다음 노드 결정
     {"tools": "tools", END: END},
 )
 graph_builder.add_edge("tools", "chatbot")
-graph_builder.add_edge("chatbot", END)
 
-# 7-3. 그래프 컴파일
+# 7. 그래프를 컴파일합니다.
 graph = graph_builder.compile()
 
-# 8. 그래프 시각화
+# 8. 그래프를 시각화하고 파일로 저장합니다.
 try:
-    # 8-1. 그래프를 PNG 파일로 저장
     png_data = graph.get_graph(xray=True).draw_mermaid_png()
-    # 8-2. 현재 작업 디렉토리에 'graph.png' 파일로 저장
     file_path = os.path.join(os.getcwd(), "graph.png")
     with open(file_path, "wb") as f:
         f.write(png_data)
-    print(f"Graph saved as {file_path}")
+    print(f"그래프가 {file_path}에 저장되었습니다.")
 except Exception as e:
-    print(f"An error occurred: {e}")
+    print(f"그래프 저장 중 오류 발생: {e}")
 
 
-# 9. 챗봇 실행
+# 9. 챗봇을 실행합니다.
 while True:
     try:
-        # 9-1. 사용자 입력 받기
-        user_input = input("질문을 입력하세요 (종료: exit): ")
+        user_input = input("질문: ")
         if user_input.lower() == "exit":
             break
-        # 8-2. 그래프 실행 및 결과 출력
+        # 스트리밍 방식으로 그래프를 실행하고 결과를 출력합니다.
         for event in graph.stream(
             {"messages": [{"role": "user", "content": user_input}]}
         ):
             for value in event.values():
                 print("Assistant:", value["messages"][-1].content)
     except Exception as e:
-        print(f"Error while running the chatbot: {e}")
+        print(f"챗봇 실행 중 오류 발생: {e}")
         break

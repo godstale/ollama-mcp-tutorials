@@ -1,6 +1,6 @@
 import bs4
 from dotenv import load_dotenv
-from langchain import hub
+from langchain_classic import hub
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_core.output_parsers import StrOutputParser
 from langchain_ollama import ChatOllama

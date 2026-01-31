@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from langsmith import Client
 from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 # 1. 환경 변수 로드
 load_dotenv()

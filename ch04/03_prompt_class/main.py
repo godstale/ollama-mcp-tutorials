@@ -1,5 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, AIMessageChunk
+from langchain.messages import SystemMessage, HumanMessage, AIMessage, AIMessageChunk
 from langchain_ollama import ChatOllama
 from typing import Iterable
 from langchain_core.runnables import RunnableGenerator

@@ -6,14 +6,15 @@ build-backend = "setuptools.build_meta"
 name = "basic-chatbot-graph"
 version = "0.1.0"
 description = "기본 챗봇 예제"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
-    "langchain-core==0.3.61",
-    "langchain-ollama==0.3.3",
-    "langchain==0.3.25",
-    "langchain-openai",
-    "langgraph",
-    "python-dotenv",
-    "langchain-community",
-    "typing-extensions"
+    "langchain>=1.1.0",
+    "langchain-core>=1.1.0",
+    "langchain-ollama>=1.0.0",
+    "langchain-community>=0.4.1",
+    "langchain-tavily>=0.1.0",
+    "langgraph>=1.0.3",
+    "python-dotenv>=1.0.0",
+    "typing-extensions>=4.15.0",
+    "tavily-python>=0.5.0"
 ]

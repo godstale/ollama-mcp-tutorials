@@ -402,9 +402,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "langchain", specifier = "==0.3.25" },
-    { name = "langchain-core", specifier = "==0.3.61" },
-    { name = "langchain-ollama", specifier = "==0.3.3" },
+    { name = "langchain" },
+    { name = "langchain-core" },
+    { name = "langchain-ollama" },
 ]
 
 [[package]]

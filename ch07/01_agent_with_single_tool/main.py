@@ -1,87 +1,62 @@
 from dotenv import load_dotenv
-from langchain.agents import Tool
-from langchain.agents.agent import AgentExecutor
-from langchain.agents.react.agent import create_react_agent
-from langchain_community.tools.tavily_search.tool import TavilySearchResults
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_agent
+from langchain.messages import AIMessage, HumanMessage
+from langchain_tavily import TavilySearchResults
 from langchain_ollama import ChatOllama
 
 
-# 환경 변수 로드 (.env 파일에서 API 키 등을 로드)
+# .env 파일에서 API 키와 같은 환경 변수를 로드합니다.
 load_dotenv()
 
-# 1. ReAct 에이전트를 위한 프롬프트 템플릿 생성
-prompt = ChatPromptTemplate.from_template(
-    """당신은 유능한 기상학자입니다. 온도에 대한 답변은 섭씨로 해주세요. 필요한 경우 다음 도구들을 사용할 수 있습니다: 
-    {tools}
+# 1. 간단한 시스템 프롬프트를 정의합니다.
+# create_agent가 내부적으로 ReAct 로직을 처리하므로 복잡한 템플릿이 필요 없습니다.
+SYSTEM_PROMPT = "당신은 유능한 기상학자입니다. 온도에 대한 답변은 섭씨로 해주세요. 사용자가 대화에서 벗어나면, 정중하게 대화를 날씨 관련 주제로 다시 유도해주세요."
 
-    Important: You must strictly follow the format below. The Final Answer should only appear after a Thought. If no Action is needed, do not skip it or write that you're proceeding without an action — always adhere to the structure.
-
-    Use the following format:
-    Question: the input question you must answer
-    Thought: you should always think about what to do
-    Action: the action to take, should be one of [{tool_names}]
-    Action Input: the input to the action
-    Observation: the result of the action
-    ... (this Thought/Action/Action Input/Observation can repeat N times)
-    Thought: I now know the final answer
-    Final Answer: the final answer to the original input question
-
-    Chat history: {chat_history}
-    Question: {question}
-    Thought:{agent_scratchpad}
-    """
-)
-
-# 2. Ollama 초기화
+# 2. 언어 모델(LLM)을 초기화합니다.
+# 여기서는 qwen3:8b 모델을 사용하는 Ollama를 설정합니다.
 llm = ChatOllama(
     model="qwen3:8b",
     temperature=0,
 )
 
-# 3. 에이전트가 사용할 도구들 초기화
-# 3-1. Tavily 검색 도구: 웹 검색을 수행
-search_tool = Tool(
-    name="WebSearch",
-    func=TavilySearchResults().run,
-    description="This is a real-time web search tool (based on Tavily service)",
-)
+# 3. 에이전트가 사용할 도구를 초기화합니다.
+# TavilySearchResults를 직접 도구 목록에 추가합니다.
+tools = [TavilySearchResults(max_results=2)]
 
-# 3-2. 도구 리스트 생성
-tools = [search_tool]
+# 4. LangChain v1 스타일의 에이전트를 생성합니다.
+# create_agent는 실행 가능한(runnable) 에이전트를 반환합니다.
+agent = create_agent(llm, tools, system_prompt=SYSTEM_PROMPT)
 
-# 4. ReAct 에이전트 생성 및 실행기 설정
-agent = create_react_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(
-    agent=agent, tools=tools, verbose=True, handle_parsing_errors=True
-)
-
-# 5. 대화 기록을 저장할 리스트 초기화
+# 5. 대화 기록을 저장할 리스트를 초기화합니다.
 chat_history = []
 
-# 6. 대화 루프 실행
-print("기상학자 AI와 대화를 시작합니다.")
+print("기상학자 AI와 대화를 시작합니다. 'exit'를 입력하면 종료됩니다.")
 
 while True:
-    # 6-1. 사용자 입력 받기
-    user_input = input("질문을 입력하세요 (종료: exit): ")
+    user_input = input("질문: ")
     if user_input.lower() == "exit":
         break
 
     try:
-        # 6-2. 에이전트 실행 및 응답 생성
-        result = agent_executor.invoke(
-            {"question": user_input, "chat_history": chat_history}
+        # 6. 대화 기록과 사용자 입력을 포함하여 에이전트를 실행합니다.
+        # create_agent는 'messages' 키에 메시지 리스트를 담은 딕셔너리를 입력으로 받습니다.
+        response = agent.invoke(
+            {
+                "messages": chat_history + [HumanMessage(content=user_input)],
+            }
         )
 
-        # 6-3. 응답 출력
-        output_text = result["output"]
-        print(f"\nAI --->\n{output_text}")
-
-        # 6-4. 대화 기록에 현재 대화 추가
-        chat_history.append(HumanMessage(content=user_input))
-        chat_history.append(AIMessage(content=output_text))
+        # 7. AI의 응답을 출력합니다.
+        ai_message = response["messages"][-1]
+        if isinstance(ai_message, AIMessage):
+            print(f"\nAI: {ai_message.content}")
+            # 8. 대화 기록을 업데이트합니다.
+            chat_history.extend(
+                [
+                    HumanMessage(content=user_input),
+                    AIMessage(content=ai_message.content),
+                ]
+            )
 
     except Exception as e:
         print(f"오류가 발생했습니다: {e}")

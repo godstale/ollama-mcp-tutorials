@@ -3,9 +3,7 @@ import uuid
 from typing import Annotated
 
 from dotenv import load_dotenv
-from langchain.agents import Tool
-from langchain.chat_models import init_chat_model
-from langchain_community.tools.tavily_search.tool import TavilySearchResults
+from langchain_tavily import TavilySearchResults
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
@@ -13,6 +11,7 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
 from langgraph.types import Command, interrupt
 from typing_extensions import TypedDict
+from langchain_ollama import ChatOllama
 
 # 환경 변수 로드 (.env 파일에서 API 키 등을 로드)
 load_dotenv()
@@ -25,11 +24,7 @@ class State(TypedDict):
 
 # 2. 도구 추가
 # 2-1. 웹 검색 도구
-search_tool = Tool(
-    name="WebSearch",
-    func=TavilySearchResults().run,
-    description="This is a real-time web search tool (based on Tavily service)",
-)
+search_tool = TavilySearchResults()
 
 
 # 2-2. 사용자 입력 도구
@@ -43,7 +38,7 @@ def human_assistance(query: str) -> str:
 tools = [search_tool, human_assistance]
 
 # 3. 모델 초기화
-llm = init_chat_model("openai:gpt-4.1-mini")
+llm = ChatOllama(model="qwen3:8b")
 llm_with_tools = llm.bind_tools(tools)
 
 # 4. 그래프 빌더 생성

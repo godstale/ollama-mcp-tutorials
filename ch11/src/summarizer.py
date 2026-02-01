@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_ollama import OllamaLLM
 
 

@@ -4,7 +4,11 @@ from langchain.messages import HumanMessage
 
 # 1. LLM 모델 객체 생성
 # with_structured_output을 사용하여 JSON 출력을 지원하도록 모델을 설정
-llm = ChatOllama(model="qwen3:8b", format="json")
+llm = ChatOllama(
+    model="qwen3:8b", 
+    # base_url="http://127.0.0.1:11434",   # Ollama 실행 에러 발생시 Ollama 서버 URL 지정
+    format="json"
+)
 
 # 2. 모델 출력 형식 지정
 class JsonResponse(BaseModel):

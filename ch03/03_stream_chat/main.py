@@ -2,7 +2,10 @@ from langchain_ollama import ChatOllama
 from langchain.messages import HumanMessage
 
 # 1. LLM 모델 객체 생성
-llm = ChatOllama(model="qwen3:8b")
+llm = ChatOllama(
+    model="qwen3:8b",
+    # base_url="http://127.0.0.1:11434"   # Ollama 실행 에러 발생시 Ollama 서버 URL 지정
+)
 
 # 2. 사용자 입력을 받아 모델에 직접 전달 (스트리밍 방식) 
 while True: 

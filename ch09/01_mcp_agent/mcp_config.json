@@ -6,17 +6,12 @@
             "transport": "stdio"
         },
         "desktop-commander": {
-            "command": "cmd",
+            "command": "npx",
             "args": [
-              "/c",
-              "npx",
-              "-y",
-              "@smithery/cli@latest",
-              "run",
-              "@wonderwhy-er/desktop-commander",
-              "--key",
-              "your-key"
-            ]
-          }
+                "-y",
+                "@wonderwhy-er/desktop-commander@latest"
+            ],
+            "transport": "stdio"
+        }
     }
 }

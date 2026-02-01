@@ -6,14 +6,13 @@ from typing import Annotated, Any, List, Optional
 
 import nest_asyncio
 from dotenv import load_dotenv
-from langchain.messages import HumanMessage, SystemMessage
+from langchain.agents import create_agent
+from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool
-from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
-from langgraph.graph.graph import CompiledGraph
 from langgraph.graph.message import add_messages
-from langchain.agents import create_agent
 from mcp_manager import cleanup_mcp_client, initialize_mcp_client
 from mcp_prompt import MCP_CHAT_PROMPT, SUPERVISOR_PROMPT
 from typing_extensions import TypedDict
@@ -22,7 +21,7 @@ from typing_extensions import TypedDict
 load_dotenv()
 
 DEFAULT_TEMPERATURE = 0.3
-MODEL_QWEN3 = "qwen3:8b"
+MODEL_GPT = "gpt-4o-mini"
 NODE_SUPERVISOR = "Supervisor"
 NODE_COMMON = "Common"
 
@@ -35,14 +34,14 @@ class AgentState(TypedDict):
 
 # 2. 모델 초기화, 검색 및 편집 에이전트 생성
 # 2-1. 채팅 모델 생성: 도구 사용이 가능한 LLM 모델 필요
-chat_model = ChatOllama(
-    model=MODEL_QWEN3,
+chat_model = ChatOpenAI(
+    model=MODEL_GPT,
     temperature=DEFAULT_TEMPERATURE,
 )
 
 
 # 2-2. 에이전트 생성
-def create_common_agent(mcp_tools: Optional[List] = None) -> CompiledGraph:
+def create_common_agent(mcp_tools: Optional[List] = None):
     # ReAct 에이전트 생성 (langchain.agents.create_agent 사용)
     common_agent = create_agent(
         model=chat_model, tools=mcp_tools, system_prompt=MCP_CHAT_PROMPT
@@ -54,12 +53,20 @@ def create_common_agent(mcp_tools: Optional[List] = None) -> CompiledGraph:
 # 3. Supervisor 노드 정의
 async def supervisor(state: AgentState):
     """Supervisor 노드: 사용자 요청을 분석하고 적절한 에이전트를 선택"""
-    print(f"\n[Supervisor] 사용자 요청 분석 시작: {len(state['messages'])}개 메시지")
+    print("\n[Supervisor] ===== 사용자 요청 분석 시작 =====")
+    print(f"[Supervisor] 메시지 개수: {len(state['messages'])}")
+
+    # 마지막 사용자 메시지 출력
+    user_messages = [msg for msg in state["messages"] if hasattr(msg, 'type') and msg.type == 'human']
+    if user_messages:
+        print(f"[Supervisor] 사용자 요청: {user_messages[-1].content}")
 
     messages = [SystemMessage(content=SUPERVISOR_PROMPT)] + state["messages"]
     print("[Supervisor] LLM 모델 호출 중...")
     response = await chat_model.ainvoke(messages)
-    print(f"[Supervisor] LLM 응답: {response.content}")
+    print("\n[Supervisor] ===== LLM 분석 결과 =====")
+    print(response.content)
+    print("[Supervisor] ===== 분석 완료 =====\n")
 
     # 응답에서 다음 에이전트 추출
     next_agent = "END"  # 기본값
@@ -67,20 +74,27 @@ async def supervisor(state: AgentState):
         try:
             next_agent = response.content.split("NEXT_AGENT:")[-1].strip()
             if next_agent not in [NODE_COMMON, "END"]:
+                print(f"[Supervisor] ⚠️ 경고: 알 수 없는 에이전트 '{next_agent}', 'END'로 변경")
                 next_agent = "END"
-            print(f"[Supervisor] 다음 에이전트 결정: {next_agent}")
-        except Exception:
+            print(f"[Supervisor] ✅ 다음 에이전트 결정: {next_agent}")
+        except Exception as e:
+            print(f"[Supervisor] ❌ 에이전트 추출 실패: {e}, 기본값 'END' 사용")
             next_agent = "END"
-            print(f"[Supervisor] 에이전트 추출 실패, 기본값 사용: {next_agent}")
     else:
-        print(f"[Supervisor] NEXT_AGENT 키워드 없음, 기본값 사용: {next_agent}")
+        print(f"[Supervisor] ⚠️ NEXT_AGENT 키워드 없음, 기본값 'END' 사용")
 
     return {"messages": [response], "next_agent": next_agent}
 
 
 # 4. 라우터 함수 정의 (에이전트 선택)
 def route_agent(state: AgentState) -> str:
-    return state.get("next_agent", "END")
+    next_agent = state.get("next_agent", "END")
+    print(f"\n[Router] 🔀 라우팅: {next_agent}")
+    if next_agent == NODE_COMMON:
+        print("[Router] → Common 에이전트로 이동 (MCP 도구 사용 가능)")
+    elif next_agent == "END":
+        print("[Router] → 작업 종료")
+    return next_agent
 
 
 # 5. 그래프 빌드
@@ -151,7 +165,9 @@ async def async_main():
 
             # 그래프 비동기 스트리밍 실행
             try:
-                print("\n=== 그래프 실행 시작 ===")
+                print("\n" + "="*60)
+                print("그래프 실행 시작")
+                print("="*60)
                 async for event in graph.astream(
                     {
                         "messages": [
@@ -169,26 +185,40 @@ async def async_main():
                         # 노드 이름에 따라 다른 출력 형식 사용
                         if hasattr(last_message, "name"):
                             if last_message.name == NODE_SUPERVISOR:
-                                print(f"\n[Supervisor] {last_message.content}")
+                                print("\n[Supervisor 응답]")
+                                print(last_message.content)
                             elif last_message.name == NODE_COMMON:
-                                print(f"\n[Common Agent] {last_message.content}")
+                                print("\n[Common Agent 응답]")
+                                print(last_message.content)
                             else:
-                                print(f"\n[{last_message.name}] {last_message.content}")
+                                print(f"\n[{last_message.name} 응답]")
+                                print(last_message.content)
                         else:
                             # 도구 호출 결과나 일반 메시지
                             if (
                                 hasattr(last_message, "tool_calls")
                                 and last_message.tool_calls
                             ):
-                                print(f"\n[Tool Call] {last_message.content}")
-                            else:
-                                print(f"\n[Message] {last_message.content}")
+                                print("\n[도구 호출 중]")
+                                for tool_call in last_message.tool_calls:
+                                    print(f"  - 도구: {tool_call.get('name', 'unknown')}")
+                                    print(f"  - 입력: {tool_call.get('args', {})}")
+                            elif hasattr(last_message, "content") and last_message.content:
+                                # 도구 실행 결과
+                                if hasattr(last_message, "name"):
+                                    print(f"\n[도구 실행 결과: {last_message.name}]")
+                                    print(last_message.content)
+                                else:
+                                    print("\n[메시지]")
+                                    print(last_message.content)
 
                     # next_agent 정보가 있으면 출력
                     if "next_agent" in event:
-                        print(f"\n[Routing] 다음 에이전트: {event['next_agent']}")
+                        print(f"\n[라우팅] 다음 에이전트: {event['next_agent']}")
 
-                print("\n=== 그래프 실행 완료 ===")
+                print("\n" + "="*60)
+                print("그래프 실행 완료")
+                print("="*60)
 
             except Exception as e:
                 print(f"\nError during graph execution: {str(e)}")

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.messages import AIMessage, HumanMessage
-from langchain_tavily import TavilySearchResults
+from langchain_tavily import TavilySearch
 from langchain_ollama import ChatOllama
 
 
@@ -20,8 +20,8 @@ llm = ChatOllama(
 )
 
 # 3. 에이전트가 사용할 도구를 초기화합니다.
-# TavilySearchResults를 직접 도구 목록에 추가합니다.
-tools = [TavilySearchResults(max_results=2)]
+# TavilySearch를 직접 도구 목록에 추가합니다.
+tools = [TavilySearch(max_results=2)]
 
 # 4. LangChain v1 스타일의 에이전트를 생성합니다.
 # create_agent는 실행 가능한(runnable) 에이전트를 반환합니다.

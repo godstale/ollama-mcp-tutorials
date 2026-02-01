@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.messages import AIMessage, HumanMessage
 from langchain.tools import tool, BaseTool
-from langchain_tavily import TavilySearchResults
+from langchain_tavily import TavilySearch
 from langchain_classic.chains.llm_math.base import LLMMathChain
 from langchain_ollama import ChatOllama
 
@@ -18,7 +18,7 @@ llm = ChatOllama(model="qwen3:8b", temperature=0)
 
 # 3. 에이전트가 사용할 도구들을 정의합니다.
 # 3-1. Tavily 검색 도구
-search_tool = TavilySearchResults(max_results=2)
+search_tool = TavilySearch(max_results=2)
 
 # 3-2. 수학 계산 도구 (langchain-classic의 LLMMathChain 사용)
 math_chain = LLMMathChain.from_llm(llm=llm)

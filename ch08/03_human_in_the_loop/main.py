@@ -3,7 +3,7 @@ import uuid
 from typing import Annotated
 
 from dotenv import load_dotenv
-from langchain_tavily import TavilySearchResults
+from langchain_tavily import TavilySearch
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
@@ -24,7 +24,7 @@ class State(TypedDict):
 
 # 2. 도구 추가
 # 2-1. 웹 검색 도구
-search_tool = TavilySearchResults()
+search_tool = TavilySearch()
 
 
 # 2-2. 사용자 입력 도구

@@ -13,14 +13,7 @@ news_url = """https://www.bbc.com/korean/articles/c166p510n79o"""
 # 2. 뉴스 스크래핑
 # 웹페이지에서 main 태그만 추출하도록 설정
 # BBC Korean 사이트는 main 태그 안에 기사 본문이 포함되어 있음
-loader = WebBaseLoader(
-    web_paths=([news_url]),
-    bs_kwargs=dict(
-        parse_only=bs4.SoupStrainer(
-            "main",
-        )
-    ),
-)
+loader = WebBaseLoader(web_paths=(news_url,))
 news_array = loader.load()
 news = news_array[0]
 

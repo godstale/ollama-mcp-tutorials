@@ -6,13 +6,13 @@ from typing import Annotated, Any, List, Optional
 
 import nest_asyncio
 from dotenv import load_dotenv
-from langchain.messages import HumanMessage, SystemMessage
+from langchain.agents import create_agent
+from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool
-from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
-from langchain.agents import create_agent
 from mcp_manager import cleanup_mcp_client, initialize_mcp_client
 from mcp_prompt import MCP_CHAT_PROMPT, SUPERVISOR_PROMPT
 from typing_extensions import TypedDict
@@ -21,7 +21,7 @@ from typing_extensions import TypedDict
 load_dotenv()
 
 DEFAULT_TEMPERATURE = 0.3
-MODEL_QWEN3 = "qwen3:8b"
+MODEL_GPT = "gpt-4o-mini"
 NODE_SUPERVISOR = "Supervisor"
 NODE_COMMON = "Common"
 
@@ -34,11 +34,10 @@ class AgentState(TypedDict):
 
 # 2. 모델 초기화, 검색 및 편집 에이전트 생성
 # 2-1. 채팅 모델 생성: 도구 사용이 가능한 LLM 모델 필요
-chat_model = ChatOllama(
-    model=MODEL_QWEN3,
+chat_model = ChatOpenAI(
+    model=MODEL_GPT,
     temperature=DEFAULT_TEMPERATURE,
 )
-# chat_model = ChatOpenAI(model_name=MODEL_OPENAI, temperature=DEFAULT_TEMPERATURE)
 
 
 # 2-2. 에이전트 생성

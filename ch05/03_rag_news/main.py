@@ -1,4 +1,3 @@
-import bs4
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 
@@ -9,13 +8,8 @@ from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 
-# 1. 문서 로딩 (Document Loading)
-loader = WebBaseLoader(
-    web_paths=("https://www.bbc.com/korean/articles/cl4yml4l6j1o",),
-    bs_kwargs=dict(
-        parse_only=bs4.SoupStrainer("div", attrs={"class": ["bbc-1cvxiy9"]})
-    ),
-)
+# 1. 문서 로딩 (Document Loading) - 전체 페이지 로드 (선택자 변경에 덜 취약)
+loader = WebBaseLoader(web_paths=("https://www.bbc.com/korean/articles/cl4yml4l6j1o",))
 docs = loader.load()
 print(f"문서의 수: {len(docs)}")
 
@@ -25,7 +19,8 @@ splits = text_splitter.split_documents(docs)
 print(f"split size: {len(splits)}")
 
 # 3. 벡터 저장소 구축 (Vector Database)
-embeddings = OllamaEmbeddings(model="bge-m3")
+OLLAMA_BASE_URL = "http://127.0.0.1:11434"
+embeddings = OllamaEmbeddings(base_url=OLLAMA_BASE_URL, model="bge-m3")
 vector_store = FAISS.from_documents(documents=splits, embedding=embeddings)
 retriever = vector_store.as_retriever()
 
@@ -40,7 +35,7 @@ prompt = PromptTemplate.from_template(
 {context}
 #Answer:"""
 )
-llm = ChatOllama(model="qwen3:8b", temperature=0)
+llm = ChatOllama(base_url="http://127.0.0.1:11434", model="qwen3:8b", temperature=0)
 chain = prompt | llm | StrOutputParser()
 question = "극한 호우의 원인은 무엇인가?"
 

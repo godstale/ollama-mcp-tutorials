@@ -9,14 +9,10 @@
       "command": "npx",
       "args": [
         "-y",
-        "@smithery/cli@latest",
-        "run",
-        "@smithery/notion",
-        "--key",
-        "e4795064-5d2c-4246-9759-46e47515a9bf",
-        "--profile",
-        "mere-wildfowl-Gjlj4R"
-      ]
+        "@ramidecodes/mcp-server-notion@latest",
+        "--api-key=YOUR_NOTION_API_KEY"
+      ],
+      "transport": "stdio"
     }
   }
 }

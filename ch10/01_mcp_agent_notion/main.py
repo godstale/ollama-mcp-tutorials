@@ -11,7 +11,6 @@ from langchain_core.tools import tool
 from langchain_ollama import ChatOllama
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
-from langgraph.graph.graph import CompiledGraph
 from langgraph.graph.message import add_messages
 from langchain.agents import create_agent
 from mcp_manager import cleanup_mcp_client, initialize_mcp_client
@@ -43,7 +42,7 @@ chat_model = ChatOllama(
 
 
 # 2-2. 에이전트 생성
-def create_common_agent(mcp_tools: Optional[List] = None) -> CompiledGraph:
+def create_common_agent(mcp_tools: Optional[List] = None):
     # ReAct 에이전트 생성 (langchain.agents.create_agent 사용)
     common_agent = create_agent(
         model=chat_model, tools=mcp_tools, system_prompt=MCP_CHAT_PROMPT
